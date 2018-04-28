@@ -32,15 +32,31 @@ const onceWithIIFE = (function() {
   }
 })();
 
+const onceWithIIFE2 = (function() {
+  let done = false;
+  return fn => (...args) => {
+    if (!done) {
+      done = true;
+      fn(...args);
+    }
+  }
+})();
+
 function test(a, b) {
   console.log("a: " + a + " b: " + b);
 }
 
-once(test('h', 'e'));
-once(test('h', 'e'));
-once(test('h', 'e'));    //这样写根本不对。test()直接调用了
+// once(test('h', 'e'));
+// once(test('h', 'e'));
+// once(test('h', 'e'));    //这样写根本不对。test()直接调用了
 
 const testOnce = once(test);    //这样调用一次，返回了一个函数对象，引用了一个done的实例
 testOnce("h", "e");
 testOnce("h", "e");
 testOnce("h", "e");
+
+// const testOnce2 = onceWithIIFE(test);
+const testOnce2 = onceWithIIFE2(test);
+testOnce2("h", "o");
+testOnce2("h", "o");
+testOnce2("h", "o");

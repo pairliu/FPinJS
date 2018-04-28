@@ -49,7 +49,7 @@ withOptimize(40);
 withOptimize(40); //没有完全优化，只有memorizing(fib)返回的函数被cache了！
 
 
-fib = memorizing(fib);
+fib = memorizing(fib);  
 const finalOptimize = addTiming(fib);
 withOptimize(50);
 withOptimize(60);
