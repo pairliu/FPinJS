@@ -20,7 +20,7 @@ roundFix(2.71828); // accum  0.43802    result 3
 roundFix(2.71828); // accum  0.15630    result 3
 
 //所以这个因为使用了内部状态从而不是纯函数了，怎么fix呢？将状态作为参数，copy，返回新的
-const roundFix2 = (a, n) => {
+const roundFix2 = (accum, n) => {
     let nRounded = accum > 0 ? Math.ceil(n) : Math.floor(n);
     accum += n - nRounded;
     return {accum, nRounded};
@@ -34,7 +34,7 @@ const fib2 = (n) => {
     if (!cache[n]) {
         if (n == 0) {
             cache[0] = 0;
-        } else if (n == 1) {    
+        } else if (n == 1) {
             cache[1] = 1;
         } else {
             cache[n] = fib2(n - 2) + fib2(n - 1);
@@ -42,3 +42,31 @@ const fib2 = (n) => {
     }
     return cache[n];
 }
+
+//这种如果要测试，可以spy/mock在Math.random()上，从而控制其返回值
+const getRandomLetter = () => {
+    const min = "A".charCodeAt();
+    const max = "Z".charCodeAt();
+    //Math.random()返回0~1之间的伪随机数
+    return String.fromCharCode(Math.floor(Math.random() * (1 + max - min)) + min);
+};
+
+//这种就只能property test了
+const getRandomFileName = (fileExt = '') => {
+    const NAME_LENGTH = 12;
+    let namePart = new Array(NAME_LENGTH);
+    for (let i = 0; i < NAME_LENGTH; i++) {
+        namePart[i] = getRandomLetter();
+    }
+    return namePart.join("") + fileExt;
+}
+
+const getRandomFileName2 = (fileExt = "", randomLetterFunc) => {  //将这个函数注入进来
+    const NAME_LENGTH = 12;
+    let namePart = new Array(NAME_LENGTH);
+    for (let i = 0; i < NAME_LENGTH; i++) {
+        namePart[i] = randomLetterFunc();
+    }
+    return namePart.join("") + fileExt;
+}
+
