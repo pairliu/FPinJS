@@ -8,6 +8,18 @@ function once(fn) {
   }
 }
 
+function onceWithGoodReturn(fn) {    //这样每次调用都会返回同一个结果
+  let done = false;
+  let result;
+  return (...args) => {
+    if (!done) {
+      done = true;
+      result = fn(...args);
+    }
+    return result;
+  }
+}
+
 function onceAndAfter(f, g) {
   let done = false;
   return (...args) => {
