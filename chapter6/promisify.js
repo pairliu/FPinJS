@@ -28,9 +28,9 @@ const promisifyWithIIFE = (function() {
 
 //这种写法对debug也很艰苦。这也说明了这是定式，不可能出错！
 const promisifyWithIIFEMore = (() => fn => (...args) => 
-  new Promise((resolve, reject) => (
-    fn(...args, (err, data) => 
-      err ? reject(err) : resolve(data)
+  new Promise((resolve, reject) => (                          //首先这里return了该Promise
+    fn(...args, (err, data) =>                                //这里也return了，因为保持跟原来fn调用的返回值一样
+      err ? reject(err) : resolve(data)                       //这里也return了！  reject()和resolve()返回值是什么呢？返回的也是个Promise，所以直接去到catch/then
     )
   )
 ))();
