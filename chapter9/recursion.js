@@ -29,31 +29,38 @@ const power = (base, pow) => {
 
 //书上的quicksort倒是利用filter和spread，创造了大量的新数组，所以跟常见的不同。倒是符合FP的思想，不过性能堪忧吧
 
-//一个动态规划的例子，然后又利用memoization
-// let makeChange = (n, bills) => {
-//     if (n < 0) return 0;
-//     else if (n === 0) return 1;
-//     else if (bills.length === 0) return 0;
-//     else return (makeChange(n, bills.slice(1)) + makeChange(n - bills[0], bills));    //关键在这里
-// }
+//一个动态规划的例子，然后又利用memoization （makeChange是换零钱的意思）
+let makeChange1 = (n, bills) => {
+    if (n < 0) return 0;
+    else if (n === 0) return 1;
+    else if (bills.length === 0) return 0;
+    else return (makeChange1(n, bills.slice(1)) + makeChange1(n - bills[0], bills));    //关键在这里
+}
 
 const memoize3 = fn => {
     let cache = {};
     return (...args) => {
-        let strX = JSON.stringify(...args);
-        // return cache[key] ? cache[key] : (cache[key] = fn(...args));     
+        let strX = JSON.stringify(...args);   //终于找到错误的地方了！！！  
         return strX in cache ? cache[strX] : (cache[strX] = fn(...args));        //判断一个key是否是对象的property，用key in obj！
     }
 }
 
-const makeChange = memoize3((n, bills) => {   //怎么memoize之后输出是6了，而不是969了？
+const memoize4 = fn => {
+    let cache = {};
+    return (...args) => {
+        let strX = JSON.stringify(args);
+        return strX in cache ? cache[strX] : (cache[strX] = fn(...args));
+    };
+};
+
+const makeChange2 = memoize4((n, bills) => {   //怎么memoize3之后输出是6了，而不是969了？终于找到原因了
     if (n < 0) return 0;
     else if (n === 0) return 1;
     else if (bills.length === 0) return 0;
-    else return (makeChange(n, bills.slice(1)) + makeChange(n - bills[0], bills))
+    else return (makeChange2(n, bills.slice(1)) + makeChange2(n - bills[0], bills))
 });
 
-console.log(makeChange(64, [100, 50, 20, 10, 5, 2, 1]));
+console.log(makeChange2(64, [100, 50, 20, 10, 5, 2, 1]));
 
 const mapR = (arr, cb) => (
     arr.length === 0 ? [] : [cb(arr[0])].concat(mapR(arr.slice(1), cb))    //这个将一个元素形成数组的方式还挺有趣：[cb(arr[0])]

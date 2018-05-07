@@ -43,9 +43,35 @@ const pipeline3 = (...fns) => {    //这个搞不对了
         let fn = fns.pop();
         return (...args) => fn(pipeline3(...fns));
     }
-}
+};
 
 console.log(pipeline3(getDir, filterOdt, count)("E:/Dev/Playground/FPinJS/chapter6"));    
 //想要也传文件扩展名作为参数遇到了困难，因为pipelining适用于相同数量的参数
 //有没有可能改造下？好像不行，因为在pipeline上的每一个函数都是返回一个值，造成了下一个函数只能接受一个参数
 // console.log(count(filterOdt(getDir("../chapter6/"))));
+
+const tee = arg => {            //这个只接受一个参数？嗯，是的，因为用于pipeline，所以前面一个的返回值肯定只有一个
+    console.log(arg);
+    return arg;  
+};
+
+//tap是个更通用的情况，接受一个fn作为参数，这个fn又以输入x作为参数，从而产生任何side effect
+//然后还要返回x，从而它可以作为pipeline中的下一个函数的输入
+const tap = curry((fn, x) => (fn(x), x));  //奥妙。注意这里的逗号运算符
+//如果不curry，明显更简单。。。
+const tap2 = fn => x => (fn(x), x);   //这就是直接在定义时用符合curry的形式嘛
+
+//讲了下怎么变成pointfree的，也就是没有function或者=>的函数定义
+const countOdtFiles3 = path => pipeTwo(pipeTwo(getDir, filterOdt), count)(path);
+const countOdtFiles4 = path => pipeTwo(getDir, pipeTwo(filterOdt, count))(path);
+//变成pointfree的，就是去掉参数
+const countOdtFiles3b = pipeTwo(pipeTwo(getDir, filterOdt), count);
+const countOdtFiles4b = pipeTwo(getDir, pipeTwo(filterOdt, count));
+
+//讲到具体怎么转变为pointfree，比如针对如下函数
+const isNegativeBalance = v => v.balance < 0;
+//这里面包含两部分，一部分是抽出balance这个属性，另一部分是跟0比较
+const isNegativeBalance2 = pipeline(
+    curry(getField)('balance'),          //这里应该可以直接写为getField("balance")吧
+    curry(binaryOp(">"))(0)
+)
