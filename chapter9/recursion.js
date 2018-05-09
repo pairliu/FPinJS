@@ -62,6 +62,39 @@ const makeChange2 = memoize4((n, bills) => {   //怎么memoize3之后输出是6�
 
 console.log(makeChange2(64, [100, 50, 20, 10, 5, 2, 1]));
 
-const mapR = (arr, cb) => (
-    arr.length === 0 ? [] : [cb(arr[0])].concat(mapR(arr.slice(1), cb))    //这个将一个元素形成数组的方式还挺有趣：[cb(arr[0])]
+const mapR = (arr, fn) => (
+    arr.length === 0 ? [] : [fn(arr[0])].concat(mapR(arr.slice(1), fn))    //这个将一个元素形成数组的方式还挺有趣：[cb(arr[0])]
 )
+//上面这个只能接受一个参数，还不完全符合map的定义
+
+//下面的利用缺省参数来达到这一目的；但是用缺省参数的一个问题是如果调用者不小心传入了这些参数，就会产生无法预期的结果
+const mapR2 = (arr, fn, i = 0, orig = arr) => 
+    arr.length === 0 ? [] : [fn(arr[0], i, orig)].concat(mapR2(arr.slice(1), fn, i + 1, orig));
+
+//书上的mapR3, mapR4有问题嘛
+const mapR3 = (orig, cb) => {
+    const mapLoop = (arr, i) =>
+        arr.length == 0 ? [] : [cb(arr[0], i, orig)].concat(mapR3(arr.slice(1), cb, i + 1, orig));
+    return mapLoop(orig, 0);
+};
+
+const mapR4 = (orig, cb) => {
+    const mapLoop = (arr, i) => {
+        if (arr.length == 0) {
+            return [];
+        } else {
+            const mapRest = mapR4(arr.slice(1), cb, i + 1, orig);
+            if (!(0 in arr)) {
+                return [,].concat(mapRest);
+            } else {
+                return [cb(arr[0], i, orig)].concat(mapRest);
+            }
+        }
+    };
+    return mapLoop(orig, 0);
+};
+
+const timesTenPlusI = (v, i) => 10 * v + i;
+const aaa = [1, 2, 3, 4, 5];
+console.log(mapR4(aaa, timesTenPlusI));
+
