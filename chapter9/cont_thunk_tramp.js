@@ -73,3 +73,24 @@ const traverseDom3C = (node, depth = 0, cont = () => {}) => {  //这个递归不
 
   return traverseChildren(Array.from(node.children));
 };
+
+//现在转变成了TC，那需要Thunk和Trampoline来解决栈溢出的问题了
+//Trampoline接受一个函数，然后不停执行之，直到结果不是个函数为止
+const trampoline = fn => {
+  while (typeof fn === 'function') {
+    fn = fn();
+  }
+  return fn;
+}
+
+const sumAll = n => (n === 0 ? 0 : n + sumAll(n - 1));
+
+const sumAllC = (n, cont) => (n === 0 ? cont(0) : sumAllC(n - 1, p => cont(n + p)));
+
+const sumAllT = (n, cont) => n === 0 ? () => cont(0) : () => sumAllT(n - 1, v => () => cont(v + n));
+
+const sumAllTT = n => trampoline(sumAllT(n, x => x));
+// console.log(sumAll(100000));
+// console.log(sumAllC(10000, x => x));
+console.log(sumAllTT(10000000));
+
