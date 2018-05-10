@@ -76,8 +76,9 @@ const traverseDom3C = (node, depth = 0, cont = () => {}) => {  //这个递归不
 
 //现在转变成了TC，那需要Thunk和Trampoline来解决栈溢出的问题了
 //Trampoline接受一个函数，然后不停执行之，直到结果不是个函数为止
-const trampoline = fn => {
+const trampoline = fn => {   //哦，这里参数虽然是fn，但其实不一定是个函数，如果不是函数，就直接返回了
   while (typeof fn === 'function') {
+    console.log(`Inside trampoline. ${fn}`)
     fn = fn();
   }
   return fn;
@@ -85,12 +86,43 @@ const trampoline = fn => {
 
 const sumAll = n => (n === 0 ? 0 : n + sumAll(n - 1));
 
+//加了cont
 const sumAllC = (n, cont) => (n === 0 ? cont(0) : sumAllC(n - 1, p => cont(n + p)));
 
-const sumAllT = (n, cont) => n === 0 ? () => cont(0) : () => sumAllT(n - 1, v => () => cont(v + n));
+//在cont和递归调用前加 ()=> 
+const sumAllT = (n, cont) => {  //转成if/else的从而好debug
+  if (n === 0) {
+    console.log("Recursive call finished. n=" + n);
+    return () => cont(0);
+  } else {
+    console.log("Recursive call. n=" + n);
+    return () => sumAllT(n - 1, v => () => cont(v + n));
+  }
+}
 
-const sumAllTT = n => trampoline(sumAllT(n, x => x));
+const myCont = function(x) {
+  console.log("Inside continuation. x=" + x);
+  return x;          //这个只执行了一次
+};  //写出来从而好debug
+
+const sumAllTT = n => trampoline(sumAllT(n, myCont));    //真是跟之前的又不同
 // console.log(sumAll(100000));
 // console.log(sumAllC(10000, x => x));
-console.log(sumAllTT(10000000));
+console.log(sumAllTT(2));
+
+//上面的Trampoline也有个问题，就是只能返回个值；如果想要返回的是个函数该怎么办？所以用另外一种类型包一下
+function Thunk(fn) {
+  this.fn = fn;
+}
+
+const trampoline2 = thk => {
+  while (typeof thk === 'object' && thk.constructor.name === 'Thunk') {
+    thk = thk.fn();    //如果是Thunk就执行其函数
+  }
+  return thk;
+}
+//书上没给怎么用的例子嘛。自己写写 （还是有问题）
+const sumAllT2 = (n, cont) => n === 0 ? new Thunk(cont(0)) : new Thunk(sumAllT2(n - 1, v => new Thunk(cont(v + n))));
+const sumAllTT2 = n => trampoline2(sumAllT2(n, x => x));
+// console.log(sumAllTT2(100000));
 
