@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "启动程序",
-            "program": "${workspaceFolder}/chapter9/cont_thunk_tramp.js"
+            "program": "${workspaceFolder}/sharing/pure_function.js"
         }
     ]
 }
