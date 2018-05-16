@@ -10,19 +10,20 @@ const myFilter = (arr, fn) => arr.reduce((acc, val) => (fn(val) ? acc.concat(val
 
 //区别find()/findIndex()和includes()/indexOf()
 
-//用reduce来模拟find()和findIndex()
-const myFind = (arr, fn) => arr.reduce((acc, val) => (fn(val) ? val : acc), undefined); //这样会找到最后一个
-
-const myFind2 = (arr, fn) => arr.reduce(
-    (acc, val) => (acc === undefined && fn(val) ? val : acc), undefined
+//用reduce来模拟find()
+const myFind = (arr, fn) => arr.reduce(
+    (acc, val) => (acc === undefined && fn(val) ? val : acc), 
+    undefined
 ); //所以找到了以后acc不是undefined了，就不会被改变了
 
 //用reduce来模拟some
 const mySome = (arr, fn) => arr.reduce(
-    (acc, val) => acc || fn(val), false
+    (acc, val) => acc || fn(val), 
+    false
 );
 
 //用reduce来模拟every
 const myEvery = (arr, fn) => arr.reduce(
-    (acc, val) => acc && fn(val), true
+    (acc, val) => acc && fn(val), 
+    true
 )

@@ -45,7 +45,7 @@ const pipeline3 = (...fns) => {    //这个搞不对了
     }
 };
 
-console.log(pipeline3(getDir, filterOdt, count)("E:/Dev/Playground/FPinJS/chapter6"));    
+console.log(pipeline2(getDir, filterOdt, count)("/Users/jliu4/Dev/Learning/FPinJS/chapter8"));    
 //想要也传文件扩展名作为参数遇到了困难，因为pipelining适用于相同数量的参数
 //有没有可能改造下？好像不行，因为在pipeline上的每一个函数都是返回一个值，造成了下一个函数只能接受一个参数
 // console.log(count(filterOdt(getDir("../chapter6/"))));

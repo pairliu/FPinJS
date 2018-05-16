@@ -17,7 +17,7 @@ function fib(n) {
   }
 }
 
-// console.log(fib(40)); 
+console.log(fib(40)); 
 
-fib = memoize(fib);
-console.log(fib(40));
+// fib = memoize(fib);
+// console.log(fib(45));

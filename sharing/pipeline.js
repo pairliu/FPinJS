@@ -22,4 +22,4 @@ const filterJs = arr => filterByText(".js", arr);   //partial application.
 
 const count = arr => arr.length;
 
-console.log(pipeline(filterByText, filterJs, count)("."));
+console.log(pipeline(getDir, filterJs, count)("/Users/jliu4/Dev/Learning/FPinJS/sharing"));
